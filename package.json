@@ -5,7 +5,10 @@
   "main": "app.js",
   "scripts": {
     "test": "node test.js",
-    "dev": "nodemon src/app.js"
+    "dev": "nodemon src/app.js",
+    "makemigration": "sequelize-mig migration:make -n crud_app --models-path src/models/",
+    "prevmigration": "sequelize-mig migration:make --preview --models-path src/models/",
+    "migrate": "sequelize db:migrate --models-path src/models/ --config src/models/config.json"
   },
   "author": "Willy Samuel Paz Colque",
   "license": "ISC",
@@ -16,11 +19,14 @@
     "express-handlebars": "^5.3.5",
     "express-mysql-session": "^2.1.7",
     "express-session": "^1.17.2",
+    "express-session-sequelize": "^2.3.0",
     "express-validator": "^6.13.0",
     "morgan": "^1.10.0",
     "mysql": "^2.18.1",
+    "mysql2": "^2.3.3",
     "passport": "^0.5.0",
     "passport-local": "^1.0.0",
+    "sequelize": "^6.9.0",
     "timeago.js": "^4.0.2"
   },
   "devDependencies": {

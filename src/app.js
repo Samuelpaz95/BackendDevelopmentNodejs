@@ -4,9 +4,11 @@ const exphbs = require('express-handlebars');
 const morgan = require("morgan");
 const flash = require('connect-flash');
 const session = require('express-session');
-const MySQLStore = require('express-mysql-session');
+const SessionStore = require('express-session-sequelize')(session.Store);
 const passport = require('passport');
-const { database } = require('./keys');
+
+const { sequelize } = require('./models/index');
+const sequelizeSessionStore = new SessionStore({db: sequelize});
 
 // initializations
 const app = express();
@@ -29,7 +31,7 @@ app.use(session({
     secret: "ThisIsMySecretKey",
     resave: false,
     saveUninitialized: false,
-    store: MySQLStore(database)
+    store: sequelizeSessionStore
 }));
 app.use(flash());
 app.use(morgan("dev"));

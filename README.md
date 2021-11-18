@@ -12,6 +12,28 @@ To run the program we need to install the following tools:
 - MySQL v8.0.27
 
 # Dependencies
+## migrations
+Install these dependencies:
+* sequelize-cli@6.3.0
+```bash
+npm install -g sequelize-cli@6.3.0
+```
+* sequelize-mig@3.1.3
+```bash
+npm install -g sequelize-mig@3.1.3
+```
+Into `src/models/config.json`:
+```json
+{
+  "development": {
+    "username": "username",
+    "password": "password",
+    "database": "databae_name",
+    "host": "localhost",
+    "dialect": "mysql"
+  }, ...
+```
+## local dependencies
 - `package.json`
 ```json
 {
@@ -22,17 +44,24 @@ To run the program we need to install the following tools:
         "express-handlebars": "^5.3.5",
         "express-mysql-session": "^2.1.7",
         "express-session": "^1.17.2",
+        "express-session-sequelize": "^2.3.0",
         "express-validator": "^6.13.0",
         "morgan": "^1.10.0",
-        "mysql": "^2.18.1",
         "passport": "^0.5.0",
         "passport-local": "^1.0.0",
+        "sequelize": "^6.9.0",
         "timeago.js": "^4.0.2"
     }
 }
 ```
 Run `npm install` to install all dependencies.
 # Launch server
+You must first build the database tables:
+```bash
+npm run makemigration
+# and
+npm run migrate
+```
 To launch the server run:
 ```bash
 npm run dev
@@ -41,29 +70,41 @@ Now visit: http://localhost:4000
 
 # Structure
 ```bash
-.
 ├── database
 │   └── db.sql
+├── migrations
+│   ├── 20211118044408_crud_app.js
+│   └── _current.json
 ├── package.json
 ├── package-lock.json
 ├── README.md
+├── seeders
 └── src
-    ├── ... # js files
+    ├── app.js
+    ├── database.js
+    ├── keys.js
     ├── lib
-    │   └── handlebars.js
+    │   ├── auth.js
+    │   ├── handlebars.js
+    │   ├── helpers.js
+    │   └── passport.js
+    ├── models
+    │   ├── config.json
+    │   ├── index.js
+    │   ├── link.js
+    │   └── user.js
     ├── public
-    │   ├── css
     │   └── js
+    │       └── main.js
     ├── routes
-    │   ├── ... # js files
+    │   ├── authentication.js
+    │   ├── index.js
+    │   └── links.js
     └── views
-        ├── index.hbs
+        ├── auth
         ├── layouts
-        │   └── main.hbs
         ├── links
-        │   ├── ... # hbs files
         └── partials
-            └── navigation.hbs
 ```
 
 # Programmer

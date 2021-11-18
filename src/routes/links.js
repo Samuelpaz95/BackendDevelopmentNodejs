@@ -1,16 +1,16 @@
-const { response } = require('express');
 const express = require('express');
-const pool = require('../database');
 const router = express.Router();
 
-const db = require('../database');
 const { isLoggedIn } = require('../lib/auth');
+const db = require('../models/index');
 
 // READING
 router.get('/', isLoggedIn, async (request, response) => {
     const { id } = request.user;
-    const links = await pool.query('SELECT * FROM links WHERE user_id = ?', [id]);
-    response.render('links/list', { links });
+    db.Link.findAll({ where: { user_id: id } }).then(links => {
+        links = links.map(link => link.dataValues)
+        response.render('links/list', { links });
+    });
 });
 
 // CREATING 
@@ -23,16 +23,18 @@ router.post('/add', isLoggedIn, async (request, response) => {
     const newLink = {
         title, lurl, descrip, user_id: request.user.id
     };
-    await pool.query('INSERT INTO links set ?', [newLink]);
-    request.flash('success', "Link saved successfully");
-    response.redirect('/links');
+    db.Link.create(newLink).then(user => {
+        user.save();
+        request.flash('success', "Link saved successfully");
+        response.redirect('/links');
+    });
 });
 
 // DELETE
 router.get('/delete/:id', isLoggedIn, async (request, response) => {
     const { id } = request.params;
     const user_id = request.user.id;
-    await pool.query('DELETE FROM links WHERE id = ? and user_id = ?', [id, user_id]);
+    db.Link.destroy({ where: { id: id, user_id: user_id } });
     response.redirect('/links');
 });
 
@@ -40,14 +42,14 @@ router.get('/delete/:id', isLoggedIn, async (request, response) => {
 router.get('/edit/:id', isLoggedIn, async (request, response) => {
     const { id } = request.params;
     const user_id = request.user.id;
-    const links = await pool.query('SELECT * FROM links WHERE id = ? and user_id = ?', [
-        id, user_id
-    ]);
-    if (links.length > 0) {
-        response.render('links/edit', { link: links[0] });
-    } else {
-        response.redirect('/links');
-    }
+    db.Link.findOne({ where: { id: id, user_id: user_id } }).then(link => {
+        if (link === null) {
+            response.redirect('/links');
+        } else {
+            link = link.dataValues;
+            response.render('links/edit', { link });
+        }
+    });
 });
 router.post('/edit/:id', isLoggedIn, async (request, response) => {
     const { id } = request.params;
@@ -56,7 +58,7 @@ router.post('/edit/:id', isLoggedIn, async (request, response) => {
     const newLink = {
         title, lurl, descrip, user_id
     };
-    await pool.query('UPDATE links set ? WHERE id = ? and user_id = ?', [newLink, id, user_id]);
+    db.Link.update(newLink, { where: { id: id, user_id: user_id } });
     response.redirect('/links');
 });
 
